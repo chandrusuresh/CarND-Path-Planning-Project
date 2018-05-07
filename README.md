@@ -69,7 +69,7 @@ Given that the highway to navigate has a fixed number of lanes (= 3), the follow
 
 ### Finite State Machine
 The above states are connected as part of a finite state machine as shown below.
-![alt text](https://raw.githubusercontent.com/chandrusuresh/projectname/branch/path/to/FSM.png)
+![alt text](https://github.com/chandrusuresh/CarND-Path-Planning-Project/blob/master/PathPlanning_FSM.png)
 At initialization, the vehicle enters the Keep Lane (KL) state in lane#1 (middle lane) at zero speed. At each step, to update the speed, the speed of traffic within 100 meters of the current car location (in the Frenet co-ordinate system) is taken into account. A speed cost function is then computed for each lane that determines a metric that takes into account the difference of speed  from the speed limit and how close each car is to the ego car for each lane. This determines the cost for keeping lane or to plan a lane change maneuver. The details of the cost function are described in detail below.
 
 To prevent constant switching between lanes, a lane change penalty of 0.5 if applied as a factor to the speed cost function value for each lane change. Suppose the speed cost value for a double lane change is c. The total cost of travelling in the new lane is therefore  c*(1+1) = 2c. If the speed cost is also c in the current lane, then the total cost for keeping in lane would be c*(1+0) = c. In this sitation, the best cost is in keeping with the current lane.
