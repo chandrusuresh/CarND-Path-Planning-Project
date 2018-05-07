@@ -70,6 +70,7 @@ Given that the highway to navigate has a fixed number of lanes (= 3), the follow
 ### Finite State Machine
 The above states are connected as part of a finite state machine as shown below.
 ![alt text](https://github.com/chandrusuresh/CarND-Path-Planning-Project/blob/master/PathPlanning_FSM.png)
+
 At initialization, the vehicle enters the Keep Lane (KL) state in lane#1 (middle lane) at zero speed. At each step, to update the speed, the speed of traffic within 100 meters of the current car location (in the Frenet co-ordinate system) is taken into account. A speed cost function is then computed for each lane that determines a metric that takes into account the difference of speed  from the speed limit and how close each car is to the ego car for each lane. This determines the cost for keeping lane or to plan a lane change maneuver. The details of the cost function are described in detail below.
 
 To prevent constant switching between lanes, a lane change penalty of 0.5 if applied as a factor to the speed cost function value for each lane change. Suppose the speed cost value for a double lane change is c. The total cost of travelling in the new lane is therefore  c*(1+1) = 2c. If the speed cost is also c in the current lane, then the total cost for keeping in lane would be c*(1+0) = c. In this sitation, the best cost is in keeping with the current lane.
@@ -107,6 +108,11 @@ This speed check logic is however not used during the LCL/LCR states, since it i
 
 ### Double Lane Change
 Sometimes, the total cost in the next lane is higher than the keep lane cost, while the total cost 2 lanes away is less. In this case, a double lane change is required for efficient driving. Since the track is windy and there is a limit of 10m/s^2 on the total acceleration, the curvature of the track/highway adds a normal (centripetal) component to the total acceleration even if the speed remains the same. In such cases, to prevent violation of the acceleration limit, the double lane change is executed as two-single lane change maneuvers. This prevents the acceleration from exceeding the limit at speeds close to the speed limit. During this lane change manuever, once the first single lane change is complete, the car checks for the total cost once again, and the second single lane change is executed only if the total cost of the second lane is still the minimum of all lanes. Note that during the execution of this maneuver, the car switches states to PLCL/PLCR twice and checks the PLCstatus and proximity status for each sub-maneuver as explained above.
+
+
+### Generating Trajectories
+Once a lane to drive and reference speed are identified, the final task is to generate the trajectories. This is done with the same approach as done in the help video. the current untraversed part of the trajectory from the previous time step is used as the starting point and a spline is fitted to a point 30,60,90meters away in the next lane from the end of the previous trajectory. The construction of a spline ensures that the new trajectory passes through all these points and is smooth in the sense of the first and second derivatives.
+Once a spline is fit, a trajectory is then interpolated from the current position to a point 30m away in the spline. Distance between each waypoint in this trajectory is determined by the reference speed and the time step of 0.02s. 
 
 ## Tips
 
