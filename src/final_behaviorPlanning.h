@@ -22,7 +22,7 @@ constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
 double rad2deg(double x) { return x * 180 / pi(); }
 
-double Ax_Lim = 9.5;
+double Ax_Lim = 9.5*8;
 double SpeedLimit = 49;
 enum States { KL, PLCL, PLCR, LCL, LCR };
 double LaneWidth = 4.0;
@@ -192,6 +192,7 @@ double getSpeedDistanceCost(vector<vector<double>> predictions, vector<double> c
     double nCarsInFront = 0;
     double speedDistCost = 0.0;
     double minDist = 1000000;
+    double car_speed = distance(0,0,car_state[4],car_state[5]);
     for (int i=0; i < predictions.size(); i++)
     {
 //        if (predictions[i][1] == car_state[1] + (double)deltaLane)
@@ -223,7 +224,8 @@ double getSpeedDistanceCost(vector<vector<double>> predictions, vector<double> c
                 }
                 else
                 {
-                    speedDistCost += (SpeedLimit - check_speed)/fabs(distDelta); // 10mph buffer
+                    // speedDistCost += (SpeedLimit - check_speed)/fabs(distDelta); // 10mph buffer
+                    speedDistCost += fabs(car_speed - min(SpeedLimit,check_speed))/fabs(distDelta); // 10mph buffer
                 }
             }
 //        }
@@ -701,7 +703,7 @@ vector<vector<vector<double>>> successor_states(vector<vector<vector<double>>> p
             int maxLane = max(1,currentLane);
             for (int k=minLane; k < maxLane; k++)
             {
-                if (true)//LCStatus[k])
+                if (LCStatus[k])
                 {
                     states.push_back(PLCL);
 //                    vector<vector<double>> trajectory = generate_trajectory(PLCL, predictions[k], currentLane, k,  car_state, prev_path_XY, map_waypoints_s, map_waypoints_x, map_waypoints_y, ref_vel, true);
@@ -720,17 +722,17 @@ vector<vector<vector<double>>> successor_states(vector<vector<vector<double>>> p
             int maxLane = totalLanes;
             for (int k=minLane; k < maxLane; k++)
             {
-                if (true)//LCStatus[k])
+                if (LCStatus[k])
                 {
                     states.push_back(PLCR);
 //                    vector<vector<double>> trajectory = generate_trajectory(PLCR, predictions[k], currentLane, k, car_state, prev_path_XY, map_waypoints_s, map_waypoints_x, map_waypoints_y, ref_vel, true);
                     vector<vector<double>> trajectory = generate_trajectory(PLCR, predictions, currentLane, k, car_state, prev_path_XY, map_waypoints_s, map_waypoints_x, map_waypoints_y, ref_vel, true);
                     trajectories.push_back(trajectory);
                 }
-                else
-                {
-                    break;
-                }
+                // else
+                // {
+                //     break;
+                // }
             }
         }
     }
